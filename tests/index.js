@@ -70,6 +70,7 @@ let idnaExamples = [
 ];
 
 let invalidInputs = [
+  '',
   'e x a m p l e',
 ];
 
@@ -101,7 +102,7 @@ describe('domainToASCII()', () => {
 
   context('Invalid inputs', () => {
     for (let input of invalidInputs) {
-      it(`should not encode ${input}`, () => {
+      it(`should not encode '${input}'`, () => {
         let result = domainToASCII(input);
         assert.equal(result, url.domainToASCII(input));
         assert.equal(result, '');
