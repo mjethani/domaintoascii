@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "c8 --include=index.js mocha --check-leaks tests"
   },
   "repository": {
     "type": "git",
@@ -24,5 +24,9 @@
   "engines": {
     "node": ">=14.0.0",
     "npm": ">=6.14.4"
+  },
+  "devDependencies": {
+    "c8": "^7.8.0",
+    "mocha": "^9.1.1"
   }
 }

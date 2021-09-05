@@ -24,7 +24,7 @@ export function domainToASCII(domain) {
                                  nextDotIndex === -1 ?
                                    domain.length :
                                    nextDotIndex);
-    if (label === '' || label === '*') {
+    if (label === '' || label === '*' || !/[^\d]/.test(label)) {
       ascii += label;
 
     } else {
