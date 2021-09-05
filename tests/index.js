@@ -20,8 +20,21 @@ import url from 'url';
 
 import { domainToASCII } from '../index.js';
 
-// http://www.i18nguy.com/markup/idna-examples.html
 let idnaExamples = [
+  // https://en.wikipedia.org/wiki/IDN_Test_TLDs
+  'مثال.إختبار',
+  'مثال.آزمایشی',
+  '例子.测试',
+  '例子.測試',
+  'ример.испытание',
+  'उदाहरण.परीक्षा',
+  'παράδειγμα.δοκιμή',
+  '실례.테스트',
+  'בײַשפּיל.טעסט',
+  '例え.テスト',
+  'உதாரணம்.பரிட்சை',
+
+  // http://www.i18nguy.com/markup/idna-examples.html
   "افغانستا.icom.museum",
   "الجزائر.icom.museum",
   "österreich.icom.museum",
@@ -72,6 +85,25 @@ let idnaExamples = [
 let invalidInputs = [
   '',
   'e x a m p l e',
+  '?foo',
+];
+
+let specialCases = [
+  { input: '-', output: '-' },
+  { input: '--', output: '--' },
+  { input: '---', output: '---' },
+  { input: '----', output: '----' },
+  { input: '_', output: '_' },
+  { input: '__', output: '__' },
+  { input: '.', output: '.' },
+  { input: '..', output: '..' },
+  { input: '127.0.0.1.to', output: '127.0.0.1.to' },
+  { input: '[::1]', output: '[::1]' },
+  { input: 'example.com.', output: 'example.com.' },
+  { input: 'example..com', output: 'example..com' },
+  { input: '.example.com', output: '.example.com' },
+  { input: '**.example.com', output: '**.example.com' },
+  { input: 'foo.**.example.com', output: 'foo.**.example.com' },
 ];
 
 describe('domainToASCII()', () => {
@@ -108,5 +140,35 @@ describe('domainToASCII()', () => {
         assert.equal(result, '');
       });
     }
+  });
+
+  context('Special cases', () => {
+    for (let { input, output } of specialCases) {
+      it(`should encode '${input}' to '${output}'`, () => {
+        let result = domainToASCII(input);
+        assert.equal(result, url.domainToASCII(input));
+        assert.equal(result, output);
+      });
+    }
+  });
+
+  // Differs from url.domainToASCII()
+  context('Quirks', () => {
+    it(`encodes 'example.com:8080' to 'example.com'`, () => {
+      assert.equal(domainToASCII('example.com:8080'), 'example.com');
+    });
+
+    it(`encodes 'foo@example.com:8080' to 'example.com'`, () => {
+      assert.equal(domainToASCII('foo@example.com:8080'), 'example.com');
+    });
+
+    it(`encodes 'https://foo@example.com:8080' to 'https.com'`, () => {
+      // !
+      assert.equal(domainToASCII('https://foo@example.com:8080'), 'https.com');
+    });
+
+    it(`encodes '/foo' to 'foo'`, () => {
+      assert.equal(domainToASCII('/foo'), 'foo');
+    });
   });
 });
