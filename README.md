@@ -11,7 +11,7 @@ console.log(ascii); // xn--i-7iq.ws
 
 ```html
 <script type="module">
-  import { domainToASCII } from 'https://raw.githubusercontent.com/mjethani/domaintoascii/main/index.js';
+  import { domainToASCII } from 'https://mjethani.github.io/domaintoascii/index.js';
 
   let ascii = domainToASCII('i❤️.ws');
   console.log(ascii); // xn--i-7iq.ws
