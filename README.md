@@ -25,3 +25,7 @@ console.log(ascii); // xn--i-7iq.ws
 The input to `punycode.toASCII()` must be [processed](https://github.com/jcranmer/idna-uts46) _before_ it is passed to the function. This makes it difficult to use, especially when the [source of the input](https://publicsuffix.org/list/) is unknown. Node.js has a [native `url.domainToASCII()` API](https://nodejs.org/api/url.html#url_url_domaintoascii_domain) but there is no such thing in the browser.
 
 This implementation uses the [browser's `URL` object](https://developer.mozilla.org/en-US/docs/Web/API/URL) to encode a Unicode domain.
+
+---
+
+[![Tests](https://github.com/mjethani/domaintoascii/actions/workflows/tests.yml/badge.svg)](https://github.com/mjethani/domaintoascii/actions/workflows/tests.yml)
