@@ -1,0 +1,28 @@
+{
+  "name": "domaintoascii",
+  "version": "0.1.0",
+  "description": "A platform-independent implementation of Node.js's domainToASCII() API using the URL object",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mjethani/domaintoascii.git"
+  },
+  "keywords": [
+    "idna",
+    "punycode"
+  ],
+  "author": "Manish Jethani <code@manishjethani.io>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mjethani/domaintoascii/issues"
+  },
+  "homepage": "https://github.com/mjethani/domaintoascii#readme",
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=6.14.4"
+  }
+}
