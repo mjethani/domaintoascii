@@ -44,8 +44,15 @@ let wasmEncode = await (async function () {
   return function wasmEncode(label) {
     let inputPtr32 = inputPtr >> 2;
     let initialInputPtr32 = inputPtr32;
-    for (let c of label)
-      buf32[++inputPtr32] = c.codePointAt(0);
+
+    for (let character of label) {
+      // Maximum input size.
+      if (inputPtr32 - initialInputPtr32 === 1023)
+        return '';
+
+      buf32[++inputPtr32] = character.codePointAt(0);
+    }
+
     buf32[initialInputPtr32] = inputPtr32 - initialInputPtr32;
 
     if (encode() !== 0)
