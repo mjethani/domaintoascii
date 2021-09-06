@@ -14,7 +14,9 @@
  * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-let wasmEncode = await (async function () {
+let { searchParams: runtimeOptions } = new URL(import.meta.url);
+
+let wasmEncode = runtimeOptions.has('use-wasm') ? await (async function () {
   let instance = null;
   let memory = null;
 
@@ -79,7 +81,7 @@ let wasmEncode = await (async function () {
       result += String.fromCodePoint(buf8[i]);
     return result === label ? result : ('xn--' + result);
   };
-})();
+})() : null;
 
 function encode(label) {
   if (wasmEncode !== null)
