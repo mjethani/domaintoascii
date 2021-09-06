@@ -135,6 +135,7 @@ describe('domainToASCII()', () => {
         let entries = content.split('\n')
                       .map(line => line.trim())
                       .map(line => line.replace(/\s*\/\/.*/, ''))
+                      .map(line => line.replace(/^!/, ''))
                       .filter(line => line !== '');
         for (let entry of entries) {
           it(`should encode ${entry}`, () => {
