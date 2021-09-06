@@ -26,6 +26,14 @@ The input to `punycode.toASCII()` must be [processed](https://github.com/jcranme
 
 This implementation uses the [browser's `URL` object](https://developer.mozilla.org/en-US/docs/Web/API/URL) to encode a Unicode domain.
 
+## WebAssembly
+
+Pass `?use-wasm` to the module to use the __experimental__ WebAssembly version.
+
+```js
+import { domainToASCII } from 'https://mjethani.github.io/domaintoascii/index.js?use-wasm';
+```
+
 ---
 
 [![Tests](https://github.com/mjethani/domaintoascii/actions/workflows/tests.yml/badge.svg)](https://github.com/mjethani/domaintoascii/actions/workflows/tests.yml)
