@@ -28,7 +28,6 @@ let wasmEncode = await (async function () {
       instance = await WebAssembly.instantiate(module, { env: { memory } });
     }
   } catch (error) {
-    console.error(error);
   }
 
   if (instance === null)
