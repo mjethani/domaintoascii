@@ -36,7 +36,10 @@ let wasmEncode = runtimeOptions.has('use-wasm') ? await (async function () {
 
     memory = new WebAssembly.Memory({ initial: 1, maximum: 1 });
     instance = await WebAssembly.instantiate(module, { env: { memory } });
+
   } catch (error) {
+    memory = null;
+    instance = null;
   }
 
   if (instance === null)
@@ -84,11 +87,11 @@ let wasmEncode = runtimeOptions.has('use-wasm') ? await (async function () {
 })() : null;
 
 function encode(label) {
-  if (wasmEncode !== null)
-    return wasmEncode(label);
-
   if (label === '' || label === '*' || !/[^a-z\d_*-]/.test(label))
     return label;
+
+  if (wasmEncode !== null)
+    return wasmEncode(label);
 
   try {
     let { hostname } = new URL('ws://' + label);
@@ -101,6 +104,9 @@ function encode(label) {
 }
 
 export function domainToASCII(domain) {
+  if (domain[0] === '[' && domain[domain.length - 1] === ']')
+    return domain;
+
   let ascii = '';
   let dotIndex = -1;
 
@@ -110,7 +116,11 @@ export function domainToASCII(domain) {
                                  nextDotIndex === -1 ?
                                    domain.length :
                                    nextDotIndex);
-    ascii += encode(label);
+    let encoded = encode(label);
+    if (encoded === '' && label !== '')
+      return '';
+
+    ascii += encoded;
 
     if (nextDotIndex === -1)
       break;
