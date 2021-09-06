@@ -42,6 +42,8 @@ let wasmEncode = await (async function () {
   let outputPtr = get_output_ptr();
 
   return function wasmEncode(label) {
+    label = label.toLowerCase();
+
     let inputPtr32 = inputPtr >> 2;
     let initialInputPtr32 = inputPtr32;
 
