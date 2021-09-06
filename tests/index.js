@@ -18,8 +18,6 @@ import { strict as assert } from 'assert';
 import { readFileSync } from 'fs';
 import url from 'url';
 
-import { domainToASCII } from '../index.js';
-
 let idnaExamples = [
   // https://en.wikipedia.org/wiki/IDN_Test_TLDs
   'مثال.إختبار',
@@ -110,68 +108,82 @@ let specialCases = [
 ];
 
 describe('domainToASCII()', () => {
-  context('IDNA examples', () => {
-    for (let example of idnaExamples) {
-      it(`should encode ${example}`, () => {
-        let result = domainToASCII(example);
-        assert.equal(result, url.domainToASCII(example));
-        assert.notEqual(result, '');
+  for (let contextDescription of [ 'URL version', 'Wasm version' ]) {
+    context(contextDescription, () => {
+      let domainToASCII = null;
+
+      before(async () => {
+        let name = '../index.js';
+        if (contextDescription === 'Wasm version')
+          name += '?use-wasm';
+
+        domainToASCII = (await import(name)).domainToASCII;
       });
-    }
-  });
 
-  context('Public suffix list', () => {
-    let content = readFileSync('tests/data/public_suffix_list.dat', 'utf8');
-    let entries = content.split('\n')
-                  .map(line => line.trim())
-                  .map(line => line.replace(/\s*\/\/.*/, ''))
-                  .filter(line => line !== '');
-    for (let entry of entries) {
-      it(`should encode ${entry}`, () => {
-        let result = domainToASCII(entry);
-        assert.equal(result, url.domainToASCII(entry));
-        assert.notEqual(result, '');
+      context('IDNA examples', () => {
+        for (let example of idnaExamples) {
+          it(`should encode ${example}`, () => {
+            let result = domainToASCII(example);
+            assert.equal(result, url.domainToASCII(example));
+            assert.notEqual(result, '');
+          });
+        }
       });
-    }
-  });
 
-  context('Invalid inputs', () => {
-    for (let input of invalidInputs) {
-      it(`should not encode '${input}'`, () => {
-        let result = domainToASCII(input);
-        assert.equal(result, url.domainToASCII(input));
-        assert.equal(result, '');
+      context('Public suffix list', () => {
+        let content = readFileSync('tests/data/public_suffix_list.dat', 'utf8');
+        let entries = content.split('\n')
+                      .map(line => line.trim())
+                      .map(line => line.replace(/\s*\/\/.*/, ''))
+                      .filter(line => line !== '');
+        for (let entry of entries) {
+          it(`should encode ${entry}`, () => {
+            let result = domainToASCII(entry);
+            assert.equal(result, url.domainToASCII(entry));
+            assert.notEqual(result, '');
+          });
+        }
       });
-    }
-  });
 
-  context('Special cases', () => {
-    for (let { input, output } of specialCases) {
-      it(`should encode '${input}' to '${output}'`, () => {
-        let result = domainToASCII(input);
-        assert.equal(result, url.domainToASCII(input));
-        assert.equal(result, output);
+      context('Invalid inputs', () => {
+        for (let input of invalidInputs) {
+          it(`should not encode '${input}'`, () => {
+            let result = domainToASCII(input);
+            assert.equal(result, url.domainToASCII(input));
+            assert.equal(result, '');
+          });
+        }
       });
-    }
-  });
 
-  // Differs from url.domainToASCII()
-  /*context('Quirks', () => {
-    it(`encodes 'example.com:8080' to 'example.com'`, () => {
-      assert.equal(domainToASCII('example.com:8080'), 'example.com');
-    });
+      context('Special cases', () => {
+        for (let { input, output } of specialCases) {
+          it(`should encode '${input}' to '${output}'`, () => {
+            let result = domainToASCII(input);
+            assert.equal(result, url.domainToASCII(input));
+            assert.equal(result, output);
+          });
+        }
+      });
 
-    it(`encodes 'foo@example.com:8080' to 'example.com'`, () => {
-      assert.equal(domainToASCII('foo@example.com:8080'), 'example.com');
-    });
+      // Differs from url.domainToASCII()
+      /*context('Quirks', () => {
+        it(`encodes 'example.com:8080' to 'example.com'`, () => {
+          assert.equal(domainToASCII('example.com:8080'), 'example.com');
+        });
 
-    it(`encodes 'https://foo@example.com:8080' to 'https.com'`, () => {
-      // !
-      assert.equal(domainToASCII('https://foo@example.com:8080'), 'https.com');
-    });
+        it(`encodes 'foo@example.com:8080' to 'example.com'`, () => {
+          assert.equal(domainToASCII('foo@example.com:8080'), 'example.com');
+        });
 
-    it(`encodes '/foo' to 'foo'`, () => {
-      assert.equal(domainToASCII('/foo'), 'foo');
+        it(`encodes 'https://foo@example.com:8080' to 'https.com'`, () => {
+          // !
+          assert.equal(domainToASCII('https://foo@example.com:8080'), 'https.com');
+        });
+
+        it(`encodes '/foo' to 'foo'`, () => {
+          assert.equal(domainToASCII('/foo'), 'foo');
+        });
+      });*/
     });
-  });*/
+  }
 });
