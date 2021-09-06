@@ -14,6 +14,17 @@
  * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+function encode(label) {
+  try {
+    let { hostname } = new URL('ws://' + label);
+    return hostname;
+
+  } catch (error) {
+  }
+
+  return '';
+}
+
 export function domainToASCII(domain) {
   let ascii = '';
   let dotIndex = -1;
@@ -28,13 +39,7 @@ export function domainToASCII(domain) {
       ascii += label;
 
     } else {
-      try {
-        let { hostname } = new URL('ws://' + label);
-        ascii += hostname;
-
-      } catch (error) {
-        return '';
-      }
+      ascii += encode(label);
     }
 
     if (nextDotIndex === -1)
