@@ -14,7 +14,55 @@
  * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+let wasmEncode = await (async function () {
+  let instance = null;
+  let memory = null;
+
+  try {
+    if (typeof fetch === 'undefined') {
+      let { readFile } = await import('fs/promises');
+      let buffer = await readFile(new URL('encoder.wasm', import.meta.url));
+      let module = await WebAssembly.compile(new Uint8Array(buffer).buffer);
+
+      memory = new WebAssembly.Memory({ initial: 1, maximum: 1 });
+      instance = await WebAssembly.instantiate(module, { env: { memory } });
+    }
+  } catch (error) {
+    console.error(error);
+  }
+
+  if (instance === null)
+    return null;
+
+  let { encode, get_input_ptr, get_output_ptr } = instance.exports;
+
+  let buf8 = new Uint8Array(memory.buffer);
+  let buf32 = new Uint32Array(memory.buffer);
+
+  let inputPtr = get_input_ptr();
+  let outputPtr = get_output_ptr();
+
+  return function wasmEncode(label) {
+    let inputPtr32 = inputPtr >> 2;
+    let initialInputPtr32 = inputPtr32;
+    for (let c of label)
+      buf32[++inputPtr32] = c.codePointAt(0);
+    buf32[initialInputPtr32] = inputPtr32 - initialInputPtr32;
+
+    if (encode() !== 0)
+      return '';
+
+    let result = '';
+    for (let i = outputPtr + 1, n = outputPtr + 1 + buf8[outputPtr]; i < n; i++)
+      result += String.fromCodePoint(buf8[i]);
+    return result === label ? result : ('xn--' + result);
+  };
+})();
+
 function encode(label) {
+  if (wasmEncode !== null)
+    return wasmEncode(label);
+
   if (label === '' || label === '*' || !/[^a-z\d_*-]/.test(label))
     return label;
 
