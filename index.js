@@ -19,14 +19,21 @@ let wasmEncode = await (async function () {
   let memory = null;
 
   try {
+    let module = null;
+    let url = new URL('encoder.wasm', import.meta.url);
+
     if (typeof fetch === 'undefined') {
       let { readFile } = await import('fs/promises');
-      let buffer = await readFile(new URL('encoder.wasm', import.meta.url));
-      let module = await WebAssembly.compile(new Uint8Array(buffer).buffer);
+      let { buffer } = new Uint8Array(await readFile(url));
 
-      memory = new WebAssembly.Memory({ initial: 1, maximum: 1 });
-      instance = await WebAssembly.instantiate(module, { env: { memory } });
+      module = await WebAssembly.compile(buffer);
+
+    } else {
+      module = await WebAssembly.compileStreaming(fetch(url));
     }
+
+    memory = new WebAssembly.Memory({ initial: 1, maximum: 1 });
+    instance = await WebAssembly.instantiate(module, { env: { memory } });
   } catch (error) {
   }
 
