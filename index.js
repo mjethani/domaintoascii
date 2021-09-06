@@ -40,7 +40,7 @@ let wasmEncode = await (async function () {
   if (instance === null)
     return null;
 
-  let { encode, get_input_ptr, get_output_ptr } = instance.exports;
+  let { encode: encode_, get_input_ptr, get_output_ptr } = instance.exports;
 
   let buf8 = new Uint8Array(memory.buffer);
   let buf32 = new Uint32Array(memory.buffer);
@@ -71,7 +71,7 @@ let wasmEncode = await (async function () {
 
     buf32[initialInputPtr32] = inputPtr32 - initialInputPtr32;
 
-    if (encode() !== 0)
+    if (encode_() !== 0)
       return '';
 
     let result = '';
