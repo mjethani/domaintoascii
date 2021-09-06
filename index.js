@@ -15,6 +15,9 @@
  */
 
 function encode(label) {
+  if (label === '' || label === '*' || !/[^a-z\d_*-]/.test(label))
+    return label;
+
   try {
     let { hostname } = new URL('ws://' + label);
     return hostname;
@@ -35,12 +38,7 @@ export function domainToASCII(domain) {
                                  nextDotIndex === -1 ?
                                    domain.length :
                                    nextDotIndex);
-    if (label === '' || label === '*' || !/[^\d]/.test(label)) {
-      ascii += label;
-
-    } else {
-      ascii += encode(label);
-    }
+    ascii += encode(label);
 
     if (nextDotIndex === -1)
       break;
