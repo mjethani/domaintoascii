@@ -59,7 +59,14 @@ let wasmEncode = await (async function () {
       if (inputPtr32 - initialInputPtr32 === 1023)
         return '';
 
-      buf32[++inputPtr32] = character.codePointAt(0);
+      let codePoint = character.codePointAt(0);
+
+      // Drop variation selectors.
+      // https://en.wikipedia.org/wiki/Variation_Selectors_(Unicode_block)
+      if (codePoint >= 0xFE00 && codePoint <= 0xFE0F)
+        continue;
+
+      buf32[++inputPtr32] = codePoint;
     }
 
     buf32[initialInputPtr32] = inputPtr32 - initialInputPtr32;
