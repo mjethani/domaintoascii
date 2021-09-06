@@ -80,6 +80,9 @@ let idnaExamples = [
   'türkiye.icom.museum',
   'украина.icom.museum',
   'việtnam.icom.museum',
+
+  // https://xn--i-7iq.ws/
+  'i❤️.ws',
 ];
 
 let invalidInputs = [
