@@ -16,9 +16,19 @@
         font-size: 200%;
         text-align: center;
       }
+
+      #error {
+        color: red;
+        font-family: monospace;
+        font-size: 50%;
+        white-space: pre;
+      }
     </style>
     <script>
       function handleDomain() {
+        let errorElement = document.getElementById('error');
+        errorElement.textContent = '';
+
         let { value } = document.getElementById('domain');
 
         new Promise(resolve => {
@@ -27,6 +37,11 @@
         .then(({ domainToASCII }) => {
           let encoded = domainToASCII(value);
           document.getElementById('encoded').textContent = encoded;
+        })
+        .catch(error => {
+          errorElement.textContent = error instanceof Error ?
+                                       error.message + '\n\n' + error.stack :
+                                       error;
         });
 
         return false;
@@ -39,5 +54,6 @@
       <input id="domain" value="i❤️.ws">
     </form>
     <p id="encoded"></p>
+    <p id="error"></p>
   </body>
 </html>
