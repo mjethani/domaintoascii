@@ -34,6 +34,8 @@
         new Promise(resolve => {
           resolve(import(`./index.js${location.search}`));
         })
+        // Wait for the WebAssembly module to be initialized.
+        .then(module => new Promise(resolve => setTimeout(() => { resolve(module); }, 1000)))
         .then(({ domainToASCII, usingWasm }) => {
           if (/[?&]use-wasm\b/.test(location.search) && !usingWasm())
             throw 'Not using Wasm';
