@@ -108,6 +108,10 @@ function encode(label) {
   return '';
 }
 
+export function usingWasm() {
+  return wasmEncode !== null;
+}
+
 export function domainToASCII(domain) {
   if (domain[0] === '[' && domain[domain.length - 1] === ']')
     return domain;

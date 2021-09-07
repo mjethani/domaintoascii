@@ -111,13 +111,24 @@ describe('domainToASCII()', () => {
   for (let contextDescription of [ 'URL version', 'Wasm version' ]) {
     context(contextDescription, () => {
       let domainToASCII = null;
+      let usingWasm = null;
 
       before(async () => {
         let name = '../index.js';
         if (contextDescription === 'Wasm version')
           name += '?use-wasm';
 
-        domainToASCII = (await import(name)).domainToASCII;
+        let module = await import(name);
+
+        domainToASCII = module.domainToASCII;
+        usingWasm = module.usingWasm;
+
+        // Wait for the WebAssembly module to be initialized.
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      });
+
+      beforeEach(async () => {
+        assert.equal(usingWasm(), contextDescription === 'Wasm version');
       });
 
       context('IDNA examples', () => {

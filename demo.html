@@ -34,7 +34,10 @@
         new Promise(resolve => {
           resolve(import(`./index.js${location.search}`));
         })
-        .then(({ domainToASCII }) => {
+        .then(({ domainToASCII, usingWasm }) => {
+          if (/[?&]use-wasm\b/.test(location.search) && !usingWasm())
+            throw 'Not using Wasm';
+
           let encoded = domainToASCII(value);
           document.getElementById('encoded').textContent = encoded;
         })
