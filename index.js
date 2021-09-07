@@ -45,6 +45,8 @@ async function loadWasm() {
   } catch (error) {
     memory = null;
     instance = null;
+
+    console.error(error);
   }
 
   if (instance === null)
