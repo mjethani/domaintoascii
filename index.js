@@ -115,8 +115,12 @@ export function usingWasm() {
 }
 
 export function domainToASCII(domain) {
+  // IPv6 address.
   if (domain[0] === '[' && domain[domain.length - 1] === ']')
     return domain;
+
+  if (/[\x00-\x29\x2B\x2C\x2F\x3A-\x40\x5B-\x5E\x60\x7B-\x7F]/.test(domain))
+    return '';
 
   let ascii = '';
   let dotIndex = -1;

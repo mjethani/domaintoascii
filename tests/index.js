@@ -85,8 +85,12 @@ let idnaExamples = [
 
 let invalidInputs = [
   '',
-  //'e x a m p l e',
-  //'?foo',
+  'e x a m p l e',
+  '/foo',
+  '?foo',
+  'example.com:8080',
+  'foo@example.com:8080',
+  'https://foo@example.com:8080',
 ];
 
 let specialCases = [
@@ -176,26 +180,6 @@ describe('domainToASCII()', () => {
           });
         }
       });
-
-      // Differs from url.domainToASCII()
-      /*context('Quirks', () => {
-        it(`encodes 'example.com:8080' to 'example.com'`, () => {
-          assert.equal(domainToASCII('example.com:8080'), 'example.com');
-        });
-
-        it(`encodes 'foo@example.com:8080' to 'example.com'`, () => {
-          assert.equal(domainToASCII('foo@example.com:8080'), 'example.com');
-        });
-
-        it(`encodes 'https://foo@example.com:8080' to 'https.com'`, () => {
-          // !
-          assert.equal(domainToASCII('https://foo@example.com:8080'), 'https.com');
-        });
-
-        it(`encodes '/foo' to 'foo'`, () => {
-          assert.equal(domainToASCII('/foo'), 'foo');
-        });
-      });*/
     });
   }
 });
