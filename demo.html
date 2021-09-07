@@ -22,7 +22,7 @@
         let { value } = document.getElementById('domain');
 
         new Promise(resolve => {
-          resolve(import('./index.js?use-wasm'));
+          resolve(import(`./index.js${location.search}`));
         })
         .then(({ domainToASCII }) => {
           let encoded = domainToASCII(value);
