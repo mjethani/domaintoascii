@@ -34,6 +34,12 @@ Pass `?use-wasm` to the module to use the __experimental__ WebAssembly version.
 import { domainToASCII } from 'https://mjethani.github.io/domaintoascii/index.js?use-wasm';
 ```
 
+## Demo
+
+[URL](https://mjethani.github.io/domaintoascii/demo.html)
+
+[Wasm (experimental)](https://mjethani.github.io/domaintoascii/demo.html?use-wasm)
+
 ---
 
 [![Tests](https://github.com/mjethani/domaintoascii/actions/workflows/tests.yml/badge.svg)](https://github.com/mjethani/domaintoascii/actions/workflows/tests.yml)
