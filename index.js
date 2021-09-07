@@ -14,9 +14,14 @@
  * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+let wasmEncode = null;
+
 let { searchParams: runtimeOptions } = new URL(import.meta.url);
 
-let wasmEncode = runtimeOptions.has('use-wasm') ? await (async function () {
+if (runtimeOptions.has('use-wasm'))
+  loadWasm();
+
+async function loadWasm() {
   let instance = null;
   let memory = null;
 
@@ -53,7 +58,7 @@ let wasmEncode = runtimeOptions.has('use-wasm') ? await (async function () {
   let inputPtr = get_input_ptr();
   let outputPtr = get_output_ptr();
 
-  return function wasmEncode(label) {
+  wasmEncode = function wasmEncode(label) {
     label = label.toLowerCase();
 
     let inputPtr32 = inputPtr >> 2;
@@ -84,7 +89,7 @@ let wasmEncode = runtimeOptions.has('use-wasm') ? await (async function () {
       result += String.fromCodePoint(buf8[i]);
     return result === label ? result : ('xn--' + result);
   };
-})() : null;
+}
 
 function encode(label) {
   if (label === '' || label === '*' || !/[^a-z\d_*-]/.test(label))
