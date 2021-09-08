@@ -81,6 +81,12 @@ let idnaExamples = [
 
   // https://xn--i-7iq.ws/
   'i❤️.ws',
+
+  // https://www.unicode.org/reports/tr46/#Deviations
+  'faß.de',
+  'βόλος.com',
+  'ශ්‍රී.com',
+  'نامه‌ای.com'
 ];
 
 let invalidInputs = [
