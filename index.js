@@ -109,13 +109,7 @@ function* codePoints(label) {
   }
 }
 
-function encode(label) {
-  if (label === '' || label === '*' || !/[^a-z\d_*-]/.test(label))
-    return label;
-
-  if (wasmEncode !== null)
-    return wasmEncode(label);
-
+function urlEncode(label) {
   try {
     let { hostname } = new URL('ws://' + label);
     return hostname;
@@ -124,6 +118,16 @@ function encode(label) {
   }
 
   return '';
+}
+
+function encode(label) {
+  if (label === '' || label === '*' || !/[^a-z\d_*-]/.test(label))
+    return label;
+
+  if (wasmEncode !== null)
+    return wasmEncode(label);
+
+  return urlEncode(label);
 }
 
 export function usingWasm() {
@@ -160,6 +164,12 @@ export function domainToASCII(domain) {
     ascii += '.';
     dotIndex = nextDotIndex;
   }
+
+  // If after conversion we have what still looks like an IPv4 address, hand it
+  // over to the URL object to figure out. e.g. 16843009 should be converted to
+  // 1.1.1.1.
+  if (/^\d+(\.\d+){0,3}\.?$/.test(ascii))
+    return urlEncode(ascii);
 
   return ascii;
 }

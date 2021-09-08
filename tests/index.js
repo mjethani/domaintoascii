@@ -111,6 +111,22 @@ let specialCases = [
   { input: 'foo.**.example.com', output: 'foo.**.example.com' },
 ];
 
+let ip4Addresses = [
+  '0',
+  '1',
+  '2',
+  '0.0',
+  '1.1',
+  '0.0.0',
+  '256',
+  '256.255',
+  '16843009',
+  '2147483647',
+  '2147483648',
+  '0.0.0.0',
+  '0.0.0.0.0',
+];
+
 describe('domainToASCII()', () => {
   for (let contextDescription of [ 'URL version', 'Wasm version' ]) {
     context(contextDescription, () => {
@@ -177,6 +193,14 @@ describe('domainToASCII()', () => {
             let result = domainToASCII(input);
             assert.equal(result, url.domainToASCII(input));
             assert.equal(result, output);
+          });
+        }
+      });
+
+      context('IPv4 addresses', () => {
+        for (let address of ip4Addresses) {
+          it(`should handle ${address} like Node.js`, () => {
+            assert.equal(domainToASCII(address), url.domainToASCII(address));
           });
         }
       });
