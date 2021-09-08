@@ -62,14 +62,14 @@ int encode() {
   bias = INITIAL_BIAS;
 
   for (j = 1; j < input_length + 1; j++) {
+    if (input[j] > 0x10FFFF || idna_disallow(input[j]))
+      return BAD_INPUT;
+
     if (input[j] < 0x80) {
       if (max_out - out < 2)
         return BIG_OUTPUT;
 
       output[out++] = (uint8_t) input[j];
-
-    } else if (input[j] > 0x10FFFF || idna_disallow(input[j])) {
-      return BAD_INPUT;
     }
   }
 
