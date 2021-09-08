@@ -15,9 +15,6 @@
  */
 
 export function idnaIgnore(codePoint) {
-  if (codePoint < 0x80)
-    return false;
-
   return (
     codePoint === 0x00AD ||
     codePoint === 0x034F ||

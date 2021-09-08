@@ -127,6 +127,11 @@ let ip4Addresses = [
   '0.0.0.0.0',
 ];
 
+let combiningMarks = [
+  '\u{0300}a',
+  'a\u{0300}',
+];
+
 describe('domainToASCII()', () => {
   for (let contextDescription of [ 'URL version', 'Wasm version' ]) {
     context(contextDescription, () => {
@@ -201,6 +206,14 @@ describe('domainToASCII()', () => {
         for (let address of ip4Addresses) {
           it(`should handle ${address} like Node.js`, () => {
             assert.equal(domainToASCII(address), url.domainToASCII(address));
+          });
+        }
+      });
+
+      context('Combining marks', () => {
+        for (let label of combiningMarks) {
+          it(`should handle ${label} like Node.js`, () => {
+            assert.equal(domainToASCII(label), url.domainToASCII(label));
           });
         }
       });

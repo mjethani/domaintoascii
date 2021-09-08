@@ -67,16 +67,23 @@ async function loadWasm() {
     let initialInputPtr32 = inputPtr32;
 
     let basicOnly = true;
+    let firstCodePoint = true;
 
     for (let codePoint of codePoints(label)) {
       // Maximum input size.
       if (inputPtr32 - initialInputPtr32 === 1023)
         return '';
 
-      if (codePoint >= 0x80)
+      if (codePoint >= 0x80) {
         basicOnly = false;
 
+        if (firstCodePoint && isCombiningMark(codePoint))
+          return '';
+      }
+
       buf32[++inputPtr32] = codePoint;
+
+      firstCodePoint = false;
     }
 
     buf32[initialInputPtr32] = inputPtr32 - initialInputPtr32;
@@ -91,11 +98,21 @@ async function loadWasm() {
   };
 }
 
+function isCombiningMark(codePoint) {
+  return (
+    (codePoint >= 0x0300 && codePoint <= 0x036F) ||
+    (codePoint >= 0x1AB0 && codePoint <= 0x1AFF) ||
+    (codePoint >= 0x1DC0 && codePoint <= 0x1DFF) ||
+    (codePoint >= 0x20D0 && codePoint <= 0x20FF) ||
+    (codePoint >= 0xFE20 && codePoint <= 0xFE2F)
+  );
+}
+
 function* codePoints(label) {
   for (let character of label) {
     let codePoint = character.codePointAt(0);
 
-    if (idnaIgnore(codePoint))
+    if (codePoint >= 0x80 && idnaIgnore(codePoint))
       continue;
 
     let value = idnaMap.get(codePoint);
