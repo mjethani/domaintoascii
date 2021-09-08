@@ -69,10 +69,12 @@ async function loadWasm() {
     let basicOnly = true;
     let firstCodePoint = true;
 
-    for (let codePoint of codePoints(label)) {
+    for (let character of mapLabel(label).normalize('NFC')) {
       // Maximum input size.
       if (inputPtr32 - initialInputPtr32 === 1023)
         return '';
+
+      let codePoint = character.codePointAt(0);
 
       if (codePoint >= 0x80) {
         basicOnly = false;
@@ -108,7 +110,9 @@ function isCombiningMark(codePoint) {
   );
 }
 
-function* codePoints(label) {
+function mapLabel(label) {
+  let mapped = '';
+
   for (let character of label) {
     let codePoint = character.codePointAt(0);
 
@@ -118,12 +122,14 @@ function* codePoints(label) {
     let value = idnaMap.get(codePoint);
 
     if (typeof value === 'undefined')
-      yield codePoint;
+      mapped += String.fromCodePoint(codePoint);
     else if (typeof value === 'number')
-      yield value;
+      mapped += String.fromCodePoint(value);
     else
-      yield* value;
+      mapped += String.fromCodePoint(...value);
   }
+
+  return mapped;
 }
 
 function urlEncode(label) {
