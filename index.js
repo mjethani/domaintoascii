@@ -103,6 +103,7 @@ async function loadWasm() {
 function isCombiningMark(codePoint) {
   return (
     (codePoint >= 0x0300 && codePoint <= 0x036F) ||
+    (codePoint >= 0x0483 && codePoint <= 0x0489) || // Cyrillic
     (codePoint >= 0x1AB0 && codePoint <= 0x1AFF) ||
     (codePoint >= 0x1DC0 && codePoint <= 0x1DFF) ||
     (codePoint >= 0x20D0 && codePoint <= 0x20FF) ||
