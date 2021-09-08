@@ -14,6 +14,8 @@
  * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+import { idnaIgnore, idnaMap } from './idna.js';
+
 let wasmEncode = null;
 
 let { searchParams: runtimeOptions } = new URL(import.meta.url);
@@ -61,22 +63,18 @@ async function loadWasm() {
   let outputPtr = get_output_ptr();
 
   wasmEncode = function wasmEncode(label) {
-    label = label.toLowerCase();
-
     let inputPtr32 = inputPtr >> 2;
     let initialInputPtr32 = inputPtr32;
 
-    for (let character of label) {
+    let basicOnly = true;
+
+    for (let codePoint of codePoints(label)) {
       // Maximum input size.
       if (inputPtr32 - initialInputPtr32 === 1023)
         return '';
 
-      let codePoint = character.codePointAt(0);
-
-      // Drop variation selectors.
-      // https://en.wikipedia.org/wiki/Variation_Selectors_(Unicode_block)
-      if (codePoint >= 0xFE00 && codePoint <= 0xFE0F)
-        continue;
+      if (codePoint >= 0x80)
+        basicOnly = false;
 
       buf32[++inputPtr32] = codePoint;
     }
@@ -89,8 +87,26 @@ async function loadWasm() {
     let result = '';
     for (let i = outputPtr + 1, n = outputPtr + 1 + buf8[outputPtr]; i < n; i++)
       result += String.fromCodePoint(buf8[i]);
-    return result === label ? result : ('xn--' + result);
+    return basicOnly ? result : 'xn--' + result;
   };
+}
+
+function* codePoints(label) {
+  for (let character of label) {
+    let codePoint = character.codePointAt(0);
+
+    if (idnaIgnore(codePoint))
+      continue;
+
+    let value = idnaMap.get(codePoint);
+
+    if (typeof value === 'undefined')
+      yield codePoint;
+    else if (typeof value === 'number')
+      yield value;
+    else
+      yield* value;
+  }
 }
 
 function encode(label) {

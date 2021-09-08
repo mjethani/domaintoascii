@@ -19,6 +19,8 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+int idna_disallow(uint32_t);
+
 enum { BASE = 36, TMIN = 1, TMAX = 26, SKEW = 38,
        DAMP = 700, INITIAL_BIAS = 72, INITIAL_N = 0x80 };
 
@@ -66,8 +68,7 @@ int encode() {
 
       output[out++] = (uint8_t) input[j];
 
-    } else if (input[j] > 0x10FFFF ||
-               (input[j] >= 0xD800 && input[j] <= 0xDBFF)) {
+    } else if (input[j] > 0x10FFFF || idna_disallow(input[j])) {
       return BAD_INPUT;
     }
   }
