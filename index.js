@@ -14,7 +14,7 @@
  * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-import { idnaIgnore, idnaMap } from './idna.js';
+import { idnaCombiningMarks, idnaIgnore, idnaMap } from './idna.js';
 
 let wasmEncode = null;
 
@@ -79,7 +79,7 @@ async function loadWasm() {
       if (codePoint >= 0x80) {
         basicOnly = false;
 
-        if (firstCodePoint && isCombiningMark(codePoint))
+        if (firstCodePoint && idnaCombiningMarks.has(codePoint))
           return '';
       }
 
@@ -98,31 +98,6 @@ async function loadWasm() {
       result += String.fromCodePoint(buf8[i]);
     return basicOnly ? result : 'xn--' + result;
   };
-}
-
-function isCombiningMark(codePoint) {
-  return (
-    (codePoint >= 0x0300 && codePoint <= 0x036F) ||
-    (codePoint >= 0x0483 && codePoint <= 0x0489) || // Cyrillic
-    (codePoint >= 0x0591 && codePoint <= 0x05BD) || // Hebrew
-    codePoint === 0x05BF || // Hebrew
-    (codePoint >= 0x05C1 && codePoint <= 0x05C2) || // Hebrew
-    (codePoint >= 0x05C4 && codePoint <= 0x05C5) || // Hebrew
-    codePoint === 0x05C7 || // Hebrew
-    (codePoint >= 0x0610 && codePoint <= 0x061A) || // Arabic
-    codePoint === 0x061D || // Arabic
-    (codePoint >= 0x064B && codePoint <= 0x0669) || // Arabic
-    (codePoint >= 0x066B && codePoint <= 0x066C) || // Arabic
-    codePoint === 0x0670 || // Arabic
-    (codePoint >= 0x06D6 && codePoint <= 0x06DC) || // Arabic
-    (codePoint >= 0x06DF && codePoint <= 0x06E4) || // Arabic
-    (codePoint >= 0x06E7 && codePoint <= 0x06E8) || // Arabic
-    (codePoint >= 0x06EA && codePoint <= 0x06ED) || // Arabic
-    (codePoint >= 0x1AB0 && codePoint <= 0x1AFF) ||
-    (codePoint >= 0x1DC0 && codePoint <= 0x1DFF) ||
-    (codePoint >= 0x20D0 && codePoint <= 0x20FF) ||
-    (codePoint >= 0xFE20 && codePoint <= 0xFE2F)
-  );
 }
 
 function mapLabel(label) {
