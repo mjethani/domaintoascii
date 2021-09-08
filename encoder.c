@@ -25,7 +25,7 @@ enum { BASE = 36, TMIN = 1, TMAX = 26, SKEW = 38,
 enum { SUCCESS, BAD_INPUT, BIG_OUTPUT, OVERFLOW };
 
 static uint32_t input[1024];
-static uint8_t output[1024];
+static uint8_t output[256];
 
 uint32_t* get_input_ptr() { return input; }
 uint8_t* get_output_ptr() { return output; }
