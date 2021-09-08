@@ -127,6 +127,9 @@ function encode(label) {
   if (wasmEncode !== null)
     return wasmEncode(label);
 
+  if (/^[\x00-\x7F]*$/.test(label))
+    return label.toLowerCase();
+
   return urlEncode(label);
 }
 

@@ -5,6 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "compare-native": "node scripts/compare-native.js",
     "test": "c8 --include=index.js mocha --check-leaks tests"
   },
   "repository": {
@@ -13,7 +14,8 @@
   },
   "keywords": [
     "idna",
-    "punycode"
+    "punycode",
+    "uts-46"
   ],
   "author": "Manish Jethani <code@manishjethani.io>",
   "license": "ISC",
