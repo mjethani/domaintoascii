@@ -35,7 +35,7 @@ static uint32_t* map(uint32_t cp) {
     i = (l + h) >> 1;
 
     if (cp < idna_tables_mapped[i].key) {
-      if (h == 0)
+      if (i == 0)
         break;
 
       h = i - 1;
@@ -58,7 +58,7 @@ static int ignore(uint32_t cp) {
     i = (l + h) >> 1;
 
     if (cp < idna_tables_ignored[i][0]) {
-      if (h == 0)
+      if (i == 0)
         break;
 
       h = i - 1;
@@ -80,9 +80,12 @@ static int disallow(uint32_t cp) {
   do {
     i = (l + h) >> 1;
 
-    if (cp < idna_tables_disallowed[i][0])
+    if (cp < idna_tables_disallowed[i][0]) {
+      if (i == 0)
+        break;
+
       h = i - 1;
-    else if (cp > idna_tables_disallowed[i][1])
+    } else if (cp > idna_tables_disallowed[i][1])
       l = i + 1;
     else
       return 1;
@@ -101,7 +104,7 @@ static int mark(uint32_t cp) {
     i = (l + h) >> 1;
 
     if (cp < idna_tables_marks[i][0]) {
-      if (h == 0)
+      if (i == 0)
         break;
 
       h = i - 1;
