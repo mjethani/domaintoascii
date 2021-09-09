@@ -158,7 +158,7 @@ export function usingWasm() {
 export function domainToASCII(domain) {
   // IPv6 address.
   if (domain[0] === '[' && domain[domain.length - 1] === ']')
-    return domain;
+    return urlEncode(domain);
 
   // Disallowed ASCII characters regardless of underlying implementation.
   if (/[\x00\t\n\r #%\/:\?@[\\\]]/.test(domain))

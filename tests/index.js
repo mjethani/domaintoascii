@@ -133,6 +133,17 @@ let ip4Addresses = [
   '0.0.0.0.0',
 ];
 
+let ip6Addresses = [
+  '[0:0:0:0:0:0:0:0]',
+  '[0:0:0:0:0:0:0:1]',
+  '[::1]',
+  '[::]',
+  '[:::]',
+  '[:]',
+  '[]',
+  '[0:0:0:0:0:0:0:0:0]',
+];
+
 let combiningMarks = [
   '\u{0300}a',
   'a\u{0300}',
@@ -210,6 +221,14 @@ describe('domainToASCII()', () => {
 
       context('IPv4 addresses', () => {
         for (let address of ip4Addresses) {
+          it(`should handle ${address} like Node.js`, () => {
+            assert.equal(domainToASCII(address), url.domainToASCII(address));
+          });
+        }
+      });
+
+      context('IPv6 addresses', () => {
+        for (let address of ip6Addresses) {
           it(`should handle ${address} like Node.js`, () => {
             assert.equal(domainToASCII(address), url.domainToASCII(address));
           });
