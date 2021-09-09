@@ -14,8 +14,6 @@
  * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-import { idnaIgnore, idnaMap } from './idna.js';
-
 let wasmEncode = null;
 
 let { searchParams: runtimeOptions } = new URL(import.meta.url);
@@ -41,7 +39,7 @@ async function loadWasm() {
       module = await WebAssembly.compileStreaming(fetch(url));
     }
 
-    memory = new WebAssembly.Memory({ initial: 1, maximum: 1 });
+    memory = new WebAssembly.Memory({ initial: 4, maximum: 4 });
     instance = await WebAssembly.instantiate(module, { env: { memory } });
 
   } catch (error) {
@@ -56,21 +54,58 @@ async function loadWasm() {
 
   let { punycode_encode,
         punycode_get_input_ptr,
-        punycode_get_output_ptr } = instance.exports;
+        punycode_get_output_ptr,
+        idna_map,
+        idna_get_input_ptr,
+        idna_get_output_ptr } = instance.exports;
 
   let buf8 = new Uint8Array(memory.buffer);
   let buf32 = new Uint32Array(memory.buffer);
 
-  let inputPtr = punycode_get_input_ptr();
-  let outputPtr = punycode_get_output_ptr();
+  let punycodeInputPtr = punycode_get_input_ptr();
+  let punycodeOutputPtr = punycode_get_output_ptr();
+
+  let idnaInputPtr = idna_get_input_ptr();
+  let idnaOutputPtr = idna_get_output_ptr();
+
+  function wasmMap(label) {
+    let inputPtr32 = idnaInputPtr >> 2;
+    let outputPtr32 = idnaOutputPtr >> 2;
+
+    let initialInputPtr32 = inputPtr32;
+
+    for (let character of label) {
+      // Maximum input size.
+      if (inputPtr32 - initialInputPtr32 === 1023)
+        return '';
+
+      buf32[++inputPtr32] = character.codePointAt(0);
+    }
+
+    buf32[initialInputPtr32] = inputPtr32 - initialInputPtr32;
+
+    if (idna_map() !== 0)
+      return '';
+
+    let result = '';
+    for (let i = outputPtr32 + 1, n = outputPtr32 + 1 + buf32[outputPtr32]; i < n; i++)
+      result += String.fromCodePoint(buf32[i]);
+    return result;
+  }
 
   wasmEncode = function wasmEncode(label) {
-    let inputPtr32 = inputPtr >> 2;
+    let inputPtr32 = punycodeInputPtr >> 2;
+    let outputPtr8 = punycodeOutputPtr;
+
     let initialInputPtr32 = inputPtr32;
 
     let basicOnly = true;
 
-    for (let character of mapLabel(label).normalize('NFC')) {
+    let mappedLabel = wasmMap(label);
+    if (mappedLabel === '')
+      return '';
+
+    for (let character of mappedLabel.normalize('NFC')) {
       // Maximum input size.
       if (inputPtr32 - initialInputPtr32 === 1023)
         return '';
@@ -89,32 +124,10 @@ async function loadWasm() {
       return '';
 
     let result = '';
-    for (let i = outputPtr + 1, n = outputPtr + 1 + buf8[outputPtr]; i < n; i++)
+    for (let i = outputPtr8 + 1, n = outputPtr8 + 1 + buf8[outputPtr8]; i < n; i++)
       result += String.fromCodePoint(buf8[i]);
     return basicOnly ? result : 'xn--' + result;
   };
-}
-
-function mapLabel(label) {
-  let mapped = '';
-
-  for (let character of label) {
-    let codePoint = character.codePointAt(0);
-
-    if (codePoint >= 0x80 && idnaIgnore(codePoint))
-      continue;
-
-    let value = idnaMap.get(codePoint);
-
-    if (typeof value === 'undefined')
-      mapped += String.fromCodePoint(codePoint);
-    else if (typeof value === 'number')
-      mapped += String.fromCodePoint(value);
-    else
-      mapped += String.fromCodePoint(...value);
-  }
-
-  return mapped;
 }
 
 function urlEncode(label) {

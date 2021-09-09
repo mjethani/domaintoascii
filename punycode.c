@@ -19,9 +19,6 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-int idna_disallow(uint32_t);
-int idna_mark(uint32_t);
-
 enum { BASE = 36, TMIN = 1, TMAX = 26, SKEW = 38,
        DAMP = 700, INITIAL_BIAS = 72, INITIAL_N = 0x80 };
 
@@ -56,9 +53,6 @@ int punycode_encode() {
   if (input_length > sizeof input - 1)
     return OVERFLOW;
 
-  if (input_length == 0 || idna_mark(input[1]))
-    return BAD_INPUT;
-
   n = INITIAL_N;
   delta = 0;
   out = 1;
@@ -66,14 +60,14 @@ int punycode_encode() {
   bias = INITIAL_BIAS;
 
   for (j = 1; j < input_length + 1; j++) {
-    if (input[j] > 0x10FFFF || idna_disallow(input[j]))
-      return BAD_INPUT;
-
     if (input[j] < 0x80) {
       if (max_out - out < 2)
         return BIG_OUTPUT;
 
       output[out++] = (uint8_t) input[j];
+    } else if (input[j] > 0x10FFFF ||
+               (input[j] >= 0xD800 && input[j] <= 0xDBFF)) {
+      return BAD_INPUT;
     }
   }
 
