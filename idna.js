@@ -14,6 +14,8 @@
  * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+// https://www.unicode.org/Public/idna/14.0.0/IdnaMappingTable.txt
+
 export function idnaIgnore(codePoint) {
   return (
     codePoint === 0x00AD ||
