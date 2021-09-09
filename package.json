@@ -15,7 +15,7 @@
   "keywords": [
     "idna",
     "punycode",
-    "uts-46"
+    "uts46"
   ],
   "author": "Manish Jethani <code@manishjethani.io>",
   "license": "ISC",
