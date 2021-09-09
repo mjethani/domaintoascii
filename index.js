@@ -142,14 +142,11 @@ function urlEncode(label) {
 }
 
 function encode(label) {
-  if (label === '' || label === '*' || !/[^a-z\d_*-]/.test(label))
-    return label;
+  if (/^[\x00-\x7F]*$/.test(label))
+    return label.toLowerCase();
 
   if (wasmEncode !== null)
     return wasmEncode(label);
-
-  if (/^[\x00-\x7F]*$/.test(label))
-    return label.toLowerCase();
 
   return urlEncode(label);
 }
