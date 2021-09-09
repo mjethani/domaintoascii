@@ -49,19 +49,26 @@ static uint32_t* map(uint32_t cp) {
 }
 
 static int ignore(uint32_t cp) {
-  return (
-    cp == 0x00AD ||
-    cp == 0x034F ||
-    (cp >= 0x180B && cp <= 0x180D) ||
-    cp == 0x180F ||
-    cp == 0x200B ||
-    cp == 0x2060 ||
-    cp == 0x2064 ||
-    (cp >= 0xFE00 && cp <= 0xFE0F) ||
-    cp == 0xFEFF ||
-    (cp >= 0x1BCA0 && cp <= 0x1BCA3) ||
-    (cp >= 0xE0100 && cp <= 0xE01EF)
-  );
+  size_t i, l, h;
+
+  l = 0;
+  h = sizeof idna_tables_ignored / sizeof idna_tables_ignored[0] - 1;
+
+  do {
+    i = (l + h) >> 1;
+
+    if (cp < idna_tables_ignored[i][0]) {
+      if (h == 0)
+        break;
+
+      h = i - 1;
+    } else if (cp > idna_tables_ignored[i][1])
+      l = i + 1;
+    else
+      return 1;
+  } while (l <= h);
+
+  return 0;
 }
 
 static int disallow(uint32_t cp) {
