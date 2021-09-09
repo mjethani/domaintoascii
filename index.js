@@ -156,6 +156,9 @@ export function usingWasm() {
 }
 
 export function domainToASCII(domain) {
+  if (domain === '')
+    return '';
+
   // IPv6 address.
   if (domain[0] === '[' && domain[domain.length - 1] === ']')
     return urlEncode(domain);
