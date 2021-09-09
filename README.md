@@ -23,6 +23,29 @@ It implements the algorithm described in [UTS #46](https://unicode.org/reports/t
 
 See [demo.html](https://mjethani.github.io/domaintoascii/demo.html)
 
+## Performance
+
+```console
+$ npm run benchmark
+
+> domaintoascii@0.1.0 benchmark
+> node scripts/benchmark.js
+
+native: 87.021ms
+Generated 1,024,580 characters
+
+domaintoascii: 64.457ms
+Generated 1,024,580 characters
+
+punycode.js: 145.172ms
+Generated 1,024,580 characters
+
+domaintoascii { skipIDNA=true }: 33.507ms
+Generated 1,024,580 characters
+
+$ 
+```
+
 ---
 
 [![Tests](https://github.com/mjethani/domaintoascii/actions/workflows/tests.yml/badge.svg)](https://github.com/mjethani/domaintoascii/actions/workflows/tests.yml)
