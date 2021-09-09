@@ -19,7 +19,7 @@ The current version is based on [Unicode 14.0.0](https://unicode.org/versions/Un
 
 ## Demo
 
-https://mjethani.github.io/domaintoascii/demo.html
+See [demo.html](https://mjethani.github.io/domaintoascii/demo.html)
 
 ---
 
