@@ -1,7 +1,7 @@
 {
   "name": "domaintoascii",
   "version": "0.1.0",
-  "description": "An implementation of Node.js's domainToASCII() in WebAssembly",
+  "description": "An implementation of Node.js's url.domainToASCII() in WebAssembly",
   "main": "index.js",
   "type": "module",
   "scripts": {
