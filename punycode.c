@@ -61,7 +61,7 @@ int punycode_encode() {
 
   for (j = 1; j < input_length + 1; j++) {
     if (input[j] < 0x80) {
-      if (max_out - out < 2)
+      if (out > max_out)
         return BIG_OUTPUT;
 
       output[out++] = (uint8_t) input[j];
@@ -73,8 +73,12 @@ int punycode_encode() {
 
   h = b = (uint32_t) (out - 1);
 
-  if (b > 0 && b < input_length)
+  if (b > 0 && b < input_length) {
+    if (out > max_out)
+      return BIG_OUTPUT;
+
     output[out++] = 0x2D;
+  }
 
   while (h < input_length) {
     for (m = 0xFFFFFFFF, j = 1; j < input_length + 1; j++) {
@@ -96,16 +100,19 @@ int punycode_encode() {
 
       if (input[j] == n) {
         for (q = delta, k = BASE;; k += BASE) {
-          if (out >= max_out)
-            return BIG_OUTPUT;
-
           t = k <= bias ? TMIN : k >= bias + TMAX ? TMAX : k - bias;
           if (q < t)
             break;
 
+          if (out > max_out)
+            return BIG_OUTPUT;
+
           output[out++] = encode_digit(t + (q - t) % (BASE - t));
           q = (q - t) / (BASE - t);
         }
+
+        if (out > max_out)
+          return BIG_OUTPUT;
 
         output[out++] = encode_digit(q);
         bias = adapt(delta, h + 1, h == b);
