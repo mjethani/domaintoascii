@@ -16,6 +16,10 @@
 
 // https://www.unicode.org/Public/idna/14.0.0/IdnaMappingTable.txt
 
+// https://www.unicode.org/reports/tr46/
+// UseSTD3ASCIIRules=true
+// Non-transitional
+
 export function idnaIgnore(codePoint) {
   return (
     codePoint === 0x00AD ||
