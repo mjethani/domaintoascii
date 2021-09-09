@@ -5,6 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "benchmark": "node scripts/benchmark.js",
     "compare-native": "node scripts/compare-native.js",
     "test": "c8 --include=index.js mocha --check-leaks tests"
   },
@@ -29,6 +30,7 @@
   },
   "devDependencies": {
     "c8": "^7.8.0",
-    "mocha": "^9.1.1"
+    "mocha": "^9.1.1",
+    "punycode": "^2.1.1"
   }
 }
