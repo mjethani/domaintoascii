@@ -25,39 +25,15 @@
       }
     </style>
     <script>
-      let savedExports = null;
-
       function handleDomain() {
         let errorElement = document.getElementById('error');
         errorElement.textContent = '';
 
         let { value } = document.getElementById('domain');
 
-        new Promise(resolve => {
-          if (savedExports !== null) {
-            resolve(savedExports);
-            return;
-          }
-
-          resolve(import(`./index.js${location.search}`));
-        })
-        .then(exports => {
-          // Wait for the WebAssembly module to be initialized.
-          if (/[?&]use-wasm\b/.test(location.search) && exports !== savedExports)
-            return new Promise(resolve => setTimeout(() => resolve(exports), 1000));
-
-          return exports;
-        })
-        .then(exports => {
-          savedExports = exports;
-
-          let { domainToASCII, usingWasm } = exports;
-
-          if (/[?&]use-wasm\b/.test(location.search) && !usingWasm())
-            throw 'Not using Wasm';
-
-          let encoded = domainToASCII(value);
-          document.getElementById('encoded').textContent = encoded;
+        import('./index.js')
+        .then(({ domainToASCII }) => {
+          document.getElementById('encoded').textContent = domainToASCII(value);
         })
         .catch(error => {
           errorElement.textContent = error instanceof Error ?
