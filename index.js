@@ -14,7 +14,7 @@
  * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-import { idnaCombiningMarks, idnaIgnore, idnaMap } from './idna.js';
+import { idnaIgnore, idnaMap } from './idna.js';
 
 let wasmEncode = null;
 
@@ -67,7 +67,6 @@ async function loadWasm() {
     let initialInputPtr32 = inputPtr32;
 
     let basicOnly = true;
-    let firstCodePoint = true;
 
     for (let character of mapLabel(label).normalize('NFC')) {
       // Maximum input size.
@@ -76,16 +75,10 @@ async function loadWasm() {
 
       let codePoint = character.codePointAt(0);
 
-      if (codePoint >= 0x80) {
+      if (codePoint >= 0x80)
         basicOnly = false;
 
-        if (firstCodePoint && idnaCombiningMarks.has(codePoint))
-          return '';
-      }
-
       buf32[++inputPtr32] = codePoint;
-
-      firstCodePoint = false;
     }
 
     buf32[initialInputPtr32] = inputPtr32 - initialInputPtr32;

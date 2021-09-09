@@ -20,6 +20,7 @@
 #include <stdint.h>
 
 int idna_disallow(uint32_t);
+int idna_mark(uint32_t);
 
 enum { BASE = 36, TMIN = 1, TMAX = 26, SKEW = 38,
        DAMP = 700, INITIAL_BIAS = 72, INITIAL_N = 0x80 };
@@ -54,6 +55,9 @@ int encode() {
 
   if (input_length > sizeof input - 1)
     return OVERFLOW;
+
+  if (input_length == 0 || idna_mark(input[1]))
+    return BAD_INPUT;
 
   n = INITIAL_N;
   delta = 0;
