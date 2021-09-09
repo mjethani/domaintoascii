@@ -30,8 +30,8 @@ enum { SUCCESS, BAD_INPUT, BIG_OUTPUT, OVERFLOW };
 static uint32_t input[1024];
 static uint8_t output[256];
 
-uint32_t* get_input_ptr() { return input; }
-uint8_t* get_output_ptr() { return output; }
+uint32_t* punycode_get_input_ptr() { return input; }
+uint8_t* punycode_get_output_ptr() { return output; }
 
 static uint8_t encode_digit(uint32_t d) { return d + 22 + 75 * (d < 26); }
 
@@ -47,7 +47,7 @@ static uint32_t adapt(uint32_t delta, uint32_t numpoints, int firsttime) {
   return k + (BASE - TMIN + 1) * delta / (delta + SKEW);
 }
 
-int encode() {
+int punycode_encode() {
   uint32_t input_length, n, delta, h, b, bias, j, m, q, k, t;
   size_t out, max_out;
 

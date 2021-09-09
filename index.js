@@ -54,13 +54,15 @@ async function loadWasm() {
   if (instance === null)
     return null;
 
-  let { encode: encode_, get_input_ptr, get_output_ptr } = instance.exports;
+  let { punycode_encode,
+        punycode_get_input_ptr,
+        punycode_get_output_ptr } = instance.exports;
 
   let buf8 = new Uint8Array(memory.buffer);
   let buf32 = new Uint32Array(memory.buffer);
 
-  let inputPtr = get_input_ptr();
-  let outputPtr = get_output_ptr();
+  let inputPtr = punycode_get_input_ptr();
+  let outputPtr = punycode_get_output_ptr();
 
   wasmEncode = function wasmEncode(label) {
     let inputPtr32 = inputPtr >> 2;
@@ -83,7 +85,7 @@ async function loadWasm() {
 
     buf32[initialInputPtr32] = inputPtr32 - initialInputPtr32;
 
-    if (encode_() !== 0)
+    if (punycode_encode() !== 0)
       return '';
 
     let result = '';
