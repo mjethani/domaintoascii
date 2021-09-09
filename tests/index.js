@@ -150,98 +150,82 @@ let combiningMarks = [
 ];
 
 describe('domainToASCII()', () => {
-  for (let contextDescription of [ 'URL version', 'Wasm version' ]) {
-    context(contextDescription, () => {
-      let domainToASCII = null;
-      let usingWasm = null;
+  let domainToASCII = null;
 
-      before(async () => {
-        let name = '../index.js';
-        if (contextDescription === 'Wasm version')
-          name += '?use-wasm';
+  before(async () => {
+    let name = '../index.js';
+    let module = await import(name);
 
-        let module = await import(name);
+    domainToASCII = module.domainToASCII;
+  });
 
-        domainToASCII = module.domainToASCII;
-        usingWasm = module.usingWasm;
-
-        // Wait for the WebAssembly module to be initialized.
-        await new Promise(resolve => setTimeout(resolve, 1000));
+  context('IDNA examples', () => {
+    for (let example of idnaExamples) {
+      it(`should encode ${example}`, () => {
+        let result = domainToASCII(example);
+        assert.equal(result, url.domainToASCII(example));
+        assert.notEqual(result, '');
       });
+    }
+  });
 
-      beforeEach(async () => {
-        assert.equal(usingWasm(), contextDescription === 'Wasm version');
+  context('Public suffix list', () => {
+    let content = readFileSync('tests/data/public_suffix_list.dat', 'utf8');
+    let entries = content.split('\n')
+                  .map(line => line.trim())
+                  .map(line => line.replace(/\s*\/\/.*/, ''))
+                  .map(line => line.replace(/^!/, ''))
+                  .filter(line => line !== '');
+    for (let entry of entries) {
+      it(`should encode ${entry}`, () => {
+        let result = domainToASCII(entry);
+        assert.equal(result, url.domainToASCII(entry));
+        assert.notEqual(result, '');
       });
+    }
+  });
 
-      context('IDNA examples', () => {
-        for (let example of idnaExamples) {
-          it(`should encode ${example}`, () => {
-            let result = domainToASCII(example);
-            assert.equal(result, url.domainToASCII(example));
-            assert.notEqual(result, '');
-          });
-        }
+  context('Invalid inputs', () => {
+    for (let input of invalidInputs) {
+      it(`should not encode '${input}'`, () => {
+        let result = domainToASCII(input);
+        assert.equal(result, url.domainToASCII(input));
+        assert.equal(result, '');
       });
+    }
+  });
 
-      context('Public suffix list', () => {
-        let content = readFileSync('tests/data/public_suffix_list.dat', 'utf8');
-        let entries = content.split('\n')
-                      .map(line => line.trim())
-                      .map(line => line.replace(/\s*\/\/.*/, ''))
-                      .map(line => line.replace(/^!/, ''))
-                      .filter(line => line !== '');
-        for (let entry of entries) {
-          it(`should encode ${entry}`, () => {
-            let result = domainToASCII(entry);
-            assert.equal(result, url.domainToASCII(entry));
-            assert.notEqual(result, '');
-          });
-        }
+  context('Special cases', () => {
+    for (let { input, output } of specialCases) {
+      it(`should encode '${input}' to '${output}'`, () => {
+        let result = domainToASCII(input);
+        assert.equal(result, url.domainToASCII(input));
+        assert.equal(result, output);
       });
+    }
+  });
 
-      context('Invalid inputs', () => {
-        for (let input of invalidInputs) {
-          it(`should not encode '${input}'`, () => {
-            let result = domainToASCII(input);
-            assert.equal(result, url.domainToASCII(input));
-            assert.equal(result, '');
-          });
-        }
+  context('IPv4 addresses', () => {
+    for (let address of ip4Addresses) {
+      it(`should handle ${address} like Node.js`, () => {
+        assert.equal(domainToASCII(address), url.domainToASCII(address));
       });
+    }
+  });
 
-      context('Special cases', () => {
-        for (let { input, output } of specialCases) {
-          it(`should encode '${input}' to '${output}'`, () => {
-            let result = domainToASCII(input);
-            assert.equal(result, url.domainToASCII(input));
-            assert.equal(result, output);
-          });
-        }
+  context('IPv6 addresses', () => {
+    for (let address of ip6Addresses) {
+      it(`should handle ${address} like Node.js`, () => {
+        assert.equal(domainToASCII(address), url.domainToASCII(address));
       });
+    }
+  });
 
-      context('IPv4 addresses', () => {
-        for (let address of ip4Addresses) {
-          it(`should handle ${address} like Node.js`, () => {
-            assert.equal(domainToASCII(address), url.domainToASCII(address));
-          });
-        }
+  context('Combining marks', () => {
+    for (let label of combiningMarks) {
+      it(`should handle ${label} like Node.js`, () => {
+        assert.equal(domainToASCII(label), url.domainToASCII(label));
       });
-
-      context('IPv6 addresses', () => {
-        for (let address of ip6Addresses) {
-          it(`should handle ${address} like Node.js`, () => {
-            assert.equal(domainToASCII(address), url.domainToASCII(address));
-          });
-        }
-      });
-
-      context('Combining marks', () => {
-        for (let label of combiningMarks) {
-          it(`should handle ${label} like Node.js`, () => {
-            assert.equal(domainToASCII(label), url.domainToASCII(label));
-          });
-        }
-      });
-    });
-  }
+    }
+  });
 });

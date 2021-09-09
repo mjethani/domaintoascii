@@ -14,43 +14,23 @@
  * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-let wasmEncode = null;
+let toASCII = await (async function () {
+  let url = new URL('encoder.wasm', import.meta.url);
 
-let { searchParams: runtimeOptions } = new URL(import.meta.url);
+  let module = null;
 
-if (runtimeOptions.has('use-wasm'))
-  loadWasm();
+  if (typeof fetch === 'undefined') {
+    let { readFile } = await import('node:fs/promises');
+    let { buffer } = new Uint8Array(await readFile(url));
 
-async function loadWasm() {
-  let instance = null;
-  let memory = null;
+    module = await WebAssembly.compile(buffer);
 
-  try {
-    let module = null;
-    let url = new URL('encoder.wasm', import.meta.url);
-
-    if (typeof fetch === 'undefined') {
-      let { readFile } = await import('fs/promises');
-      let { buffer } = new Uint8Array(await readFile(url));
-
-      module = await WebAssembly.compile(buffer);
-
-    } else {
-      module = await WebAssembly.compileStreaming(fetch(url));
-    }
-
-    memory = new WebAssembly.Memory({ initial: 3, maximum: 3 });
-    instance = await WebAssembly.instantiate(module, { env: { memory } });
-
-  } catch (error) {
-    memory = null;
-    instance = null;
-
-    console.error(error);
+  } else {
+    module = await WebAssembly.compileStreaming(fetch(url));
   }
 
-  if (instance === null)
-    return null;
+  let memory = new WebAssembly.Memory({ initial: 3, maximum: 3 });
+  let instance = await WebAssembly.instantiate(module, { env: { memory } });
 
   let { punycode_encode,
         punycode_get_input_ptr,
@@ -68,13 +48,13 @@ async function loadWasm() {
   let idnaInputPtr = idna_get_input_ptr();
   let idnaOutputPtr = idna_get_output_ptr();
 
-  function wasmMap(label) {
+  function wasmIDNAMap(domain) {
     let inputPtr32 = idnaInputPtr >> 2;
     let outputPtr32 = idnaOutputPtr >> 2;
 
     let initialInputPtr32 = inputPtr32;
 
-    for (let character of label) {
+    for (let character of domain) {
       // Maximum input size.
       if (inputPtr32 - initialInputPtr32 === 1023)
         return '';
@@ -93,7 +73,7 @@ async function loadWasm() {
     return result;
   }
 
-  wasmEncode = function wasmEncode(label) {
+  function wasmPunycodeEncode(label) {
     let inputPtr32 = punycodeInputPtr >> 2;
     let outputPtr8 = punycodeOutputPtr;
 
@@ -101,11 +81,7 @@ async function loadWasm() {
 
     let basicOnly = true;
 
-    let mappedLabel = wasmMap(label);
-    if (mappedLabel === '')
-      return '';
-
-    for (let character of mappedLabel.normalize('NFC')) {
+    for (let character of label) {
       // Maximum input size.
       if (inputPtr32 - initialInputPtr32 === 1023)
         return '';
@@ -127,32 +103,51 @@ async function loadWasm() {
     for (let i = outputPtr8 + 1, n = outputPtr8 + 1 + buf8[outputPtr8]; i < n; i++)
       result += String.fromCodePoint(buf8[i]);
     return basicOnly ? result : 'xn--' + result;
-  };
-}
+  }
 
-function urlEncode(label) {
+  return function (domain) {
+    domain = wasmIDNAMap(domain);
+
+    if (domain === '')
+      return '';
+
+    domain = domain.normalize('NFC');
+
+    let ascii = '';
+    let dotIndex = -1;
+
+    while (true) {
+      let nextDotIndex = domain.indexOf('.', dotIndex + 1);
+      let label = domain.substring(dotIndex + 1,
+                                   nextDotIndex === -1 ?
+                                     domain.length :
+                                     nextDotIndex);
+      let encoded = wasmPunycodeEncode(label);
+      if (encoded === '' && label !== '')
+        return '';
+
+      ascii += encoded;
+
+      if (nextDotIndex === -1)
+        break;
+
+      ascii += '.';
+      dotIndex = nextDotIndex;
+    }
+
+    return ascii;
+  };
+})();
+
+function urlEncode(domain) {
   try {
-    let { hostname } = new URL('ws://' + label);
+    let { hostname } = new URL('ws://' + domain);
     return hostname;
 
   } catch (error) {
   }
 
   return '';
-}
-
-function encode(label) {
-  if (/^[\x00-\x7F]*$/.test(label))
-    return label.toLowerCase();
-
-  if (wasmEncode !== null)
-    return wasmEncode(label);
-
-  return urlEncode(label);
-}
-
-export function usingWasm() {
-  return wasmEncode !== null;
 }
 
 export function domainToASCII(domain) {
@@ -167,27 +162,9 @@ export function domainToASCII(domain) {
   if (/[\x00\t\n\r #%\/:\?@[\\\]]/.test(domain))
     return '';
 
-  let ascii = '';
-  let dotIndex = -1;
-
-  while (true) {
-    let nextDotIndex = domain.indexOf('.', dotIndex + 1);
-    let label = domain.substring(dotIndex + 1,
-                                 nextDotIndex === -1 ?
-                                   domain.length :
-                                   nextDotIndex);
-    let encoded = encode(label);
-    if (encoded === '' && label !== '')
-      return '';
-
-    ascii += encoded;
-
-    if (nextDotIndex === -1)
-      break;
-
-    ascii += '.';
-    dotIndex = nextDotIndex;
-  }
+  let ascii = /^[\x00-\x7F]*$/.test(domain) ?
+                domain.toLowerCase() :
+                toASCII(domain);
 
   if (/^\d+(\.\d+){0,3}\.?$/.test(ascii))
     return urlEncode(ascii);

@@ -17,11 +17,7 @@
 import assert from 'assert';
 import url from 'url';
 
-import { domainToASCII, usingWasm } from '../index.js?use-wasm';
-
-// Wait for the WebAssembly module to be initialized.
-await new Promise(resolve => setTimeout(resolve, 1000));
-assert(usingWasm());
+import { domainToASCII } from '../index.js';
 
 let maxUnicode = 0x10FFFF;
 
