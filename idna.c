@@ -25,7 +25,7 @@
 
 typedef struct {
   uint32_t key;
-  uint32_t value[7];
+  uint32_t value[6];
 } mapped_entry;
 
 static mapped_entry mapped[] = {
@@ -7372,7 +7372,7 @@ static int mark(uint32_t cp) {
 }
 
 int idna_map() {
-  size_t i, out;
+  size_t i, j, out;
   uint32_t* value;
 
   out = 1;
@@ -7400,12 +7400,12 @@ int idna_map() {
 
       output[out++] = input[i];
     } else {
-      while (*value != 0) {
+      // Maximum 6 code points.
+      for (j = 0; j < 6 && *value != 0; j++, value++) {
         if (out >= sizeof output)
           return 2;
 
         output[out++] = *value;
-        value++;
       }
     }
   }

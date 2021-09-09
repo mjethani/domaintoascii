@@ -39,7 +39,7 @@ async function loadWasm() {
       module = await WebAssembly.compileStreaming(fetch(url));
     }
 
-    memory = new WebAssembly.Memory({ initial: 4, maximum: 4 });
+    memory = new WebAssembly.Memory({ initial: 3, maximum: 3 });
     instance = await WebAssembly.instantiate(module, { env: { memory } });
 
   } catch (error) {
