@@ -105,13 +105,15 @@ let toASCII = await (async function () {
     return basicOnly ? result : 'xn--' + result;
   }
 
-  return function (domain) {
-    domain = wasmIDNAMap(domain);
+  return function (domain, { skipIDNA }) {
+    if (!skipIDNA) {
+      domain = wasmIDNAMap(domain);
 
-    if (domain === '')
-      return '';
+      if (domain === '')
+        return '';
 
-    domain = domain.normalize('NFC');
+      domain = domain.normalize('NFC');
+    }
 
     let ascii = '';
     let dotIndex = -1;
@@ -150,7 +152,7 @@ function urlEncode(domain) {
   return '';
 }
 
-export function domainToASCII(domain) {
+export function domainToASCII(domain, { skipIDNA = false } = {}) {
   if (domain === '')
     return '';
 
@@ -164,7 +166,7 @@ export function domainToASCII(domain) {
 
   let ascii = /^[\x00-\x7F]*$/.test(domain) ?
                 domain.toLowerCase() :
-                toASCII(domain);
+                toASCII(domain, { skipIDNA });
 
   if (/^\d+(\.\d+){0,3}\.?$/.test(ascii))
     return urlEncode(ascii);
