@@ -82,11 +82,26 @@ let idnaExamples = [
   // https://xn--i-7iq.ws/
   'i❤️.ws',
 
+  // https://unicode.org/reports/tr46/#IDNA2003-Section
+  'Bücher.de',
+  'bücher.de',
+  'Buecher.de',
+  'buecher.de',
+
+  // https://unicode.org/reports/tr46/#IDNA2008-Section
+  'ÖBB.at',
+  'öbb.at',
+  'OEBB.at',
+  'oebb.at',
+
   // https://www.unicode.org/reports/tr46/#Deviations
   'faß.de',
   'βόλος.com',
   'ශ්‍රී.com',
-  'نامه‌ای.com'
+  'نامه‌ای.com',
+
+  // https://unicode.org/reports/tr46/#Compatibility_Processing
+  '√.com',
 ];
 
 let invalidInputs = [
