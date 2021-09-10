@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "benchmark": "node scripts/benchmark.js",
+    "build-idna-tables": "node scripts/build-idna-tables.js",
     "compare-native": "node scripts/compare-native.js",
     "test": "c8 --include=index.js mocha --check-leaks tests"
   },

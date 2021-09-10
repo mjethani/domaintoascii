@@ -17,7 +17,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#include "idna_tables.h"
+#include "idna_tables-generated.h"
 
 static uint32_t input[1024];
 static uint32_t output[1024];
