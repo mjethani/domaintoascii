@@ -116,6 +116,9 @@ let specialCases = [
   { input: '**.example.com', output: '**.example.com' },
   { input: 'foo.**.example.com', output: 'foo.**.example.com' },
   { input: 'a\x7Fb', output: 'a\x7Fb' },
+  { input: 'a\x7F', output: 'a\x7F' },
+  { input: '\x7Fb', output: '\x7Fb' },
+  { input: '\x7F', output: '\x7F' },
 ];
 
 let ip4Addresses = [
