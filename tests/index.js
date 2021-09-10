@@ -149,6 +149,13 @@ let combiningMarks = [
   'a\u{0300}',
 ];
 
+// https://datatracker.ietf.org/doc/html/rfc3490#section-3.1
+let rfc3490Separators = [
+  'www\u{3002}i\u{2764}.ws',
+  'www\u{FF0E}i\u{2764}.ws',
+  'www\u{FF61}i\u{2764}.ws',
+];
+
 describe('domainToASCII()', () => {
   let domainToASCII = null;
 
@@ -225,6 +232,14 @@ describe('domainToASCII()', () => {
     for (let label of combiningMarks) {
       it(`should handle ${label} like Node.js`, () => {
         assert.equal(domainToASCII(label), url.domainToASCII(label));
+      });
+    }
+  });
+
+  context('RFC 3490 separators', () => {
+    for (let domain of rfc3490Separators) {
+      it(`should handle ${domain} like Node.js`, () => {
+        assert.equal(domainToASCII(domain), url.domainToASCII(domain));
       });
     }
   });
