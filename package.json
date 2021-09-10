@@ -16,6 +16,7 @@
   "keywords": [
     "idna",
     "punycode",
+    "unicode",
     "uts46"
   ],
   "author": "Manish Jethani <code@manishjethani.io>",
