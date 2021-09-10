@@ -133,19 +133,22 @@ int idna_map() {
     if (disallow(input[i]))
       return 3;
 
-    // Note: This step is to be performed after mapping and normalization, but
-    // it does not seem to matter in practice.
-    if ((i == 1 || input[i - 1] == 0x2E) && mark(input[i]))
-      return 4;
-
     value = map(input[i]);
 
     if (value == NULL) {
       if (out >= sizeof output)
         return 2;
 
+      // Note: This step is to be performed after normalization, but it does
+      // not seem to matter in practice.
+      if ((out == 1 || output[out - 1] == 0x2E) && mark(input[i]))
+        return 4;
+
       output[out++] = input[i];
     } else {
+      if ((out == 1 || output[out - 1] == 0x2E) && mark(*value))
+        return 4;
+
       // Maximum 6 code points.
       for (j = 0; j < 6 && *value != 0; j++, value++) {
         if (out >= sizeof output)
