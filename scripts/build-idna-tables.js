@@ -17,8 +17,8 @@
 import { writeFileSync } from 'fs';
 import https from 'https';
 
-let idnaMappingTableURL = 'https://unicode.org/Public/idna/14.0.0/IdnaMappingTable.txt';
-let unicodeDataURL = 'https://unicode.org/Public/14.0.0/ucd/UnicodeData.txt';
+let idnaMappingTableURL = 'https://unicode.org/Public/idna/13.0.0/IdnaMappingTable.txt';
+let unicodeDataURL = 'https://unicode.org/Public/13.0.0/ucd/UnicodeData.txt';
 
 function download(url) {
   let read = message => new Promise(resolve => {

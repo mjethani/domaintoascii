@@ -15,7 +15,7 @@ npm i mjethani/domaintoascii
 
 This is an implementation of Node.js's [`url.domainToASCII()`](https://nodejs.org/api/url.html#url_url_domaintoascii_domain) in WebAssembly.
 
-The current version is based on [Unicode 14.0.0](https://unicode.org/versions/Unicode14.0.0/).
+The current version is based on [Unicode 13.0.0](https://unicode.org/versions/Unicode13.0.0/).
 
 It implements the algorithm described in [UTS #46](https://unicode.org/reports/tr46/), with __non-transitional processing__ and __UseSTD3ASCIIRules=false__.
 
