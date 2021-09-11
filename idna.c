@@ -45,6 +45,23 @@ static uint32_t* map(uint32_t cp) {
       return idna_tables_mapped[i].value;
   } while (l <= h);
 
+  l = 0;
+  h = sizeof idna_tables_mapped_long / sizeof idna_tables_mapped_long[0] - 1;
+
+  do {
+    i = (l + h) >> 1;
+
+    if (cp < idna_tables_mapped_long[i].key) {
+      if (i == 0)
+        break;
+
+      h = i - 1;
+    } else if (cp > idna_tables_mapped_long[i].key)
+      l = i + 1;
+    else
+      return idna_tables_mapped_long[i].value;
+  } while (l <= h);
+
   return NULL;
 }
 
@@ -149,8 +166,7 @@ int idna_map() {
       if ((out == 1 || output[out - 1] == 0x2E) && mark(*value))
         return 4;
 
-      // Maximum 6 code points.
-      for (j = 0; j < 6 && *value != 0; j++, value++) {
+      for (; *value != 0; value++) {
         if (out >= sizeof output)
           return 2;
 
