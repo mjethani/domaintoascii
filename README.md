@@ -17,7 +17,7 @@ This is an implementation of Node.js's [`url.domainToASCII()`](https://nodejs.or
 
 The current version is based on [Unicode 14.0.0](https://unicode.org/versions/Unicode14.0.0/).
 
-It implements the algorithm described in [UTS #46](https://unicode.org/reports/tr46/), with __non-transitional processing__ and __UseSTD3ASCIIRules=true__.
+It implements the algorithm described in [UTS #46](https://unicode.org/reports/tr46/), with __non-transitional processing__ and __UseSTD3ASCIIRules=false__.
 
 ## Demo
 

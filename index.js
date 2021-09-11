@@ -115,6 +115,9 @@ let toASCII = await (async function () {
       domain = domain.normalize('NFC');
     }
 
+    if (/[\x00\t\n\r #%\/:\?@[\\\]]/.test(domain))
+      return '';
+
     let ascii = '';
     let dotIndex = -1;
 

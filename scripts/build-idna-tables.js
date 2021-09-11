@@ -52,7 +52,7 @@ let [ idnaMappingTable, unicodeData ] = await Promise.all([
 ]);
 
 // https://unicode.org/reports/tr46/
-// UseSTD3ASCIIRules=true
+// UseSTD3ASCIIRules=false
 // Non-transitional
 
 let parsed = {
@@ -72,9 +72,7 @@ let parsed = {
     let [ codePoint, spec, value ] = line.split(';').map(x => x.trim());
 
     switch (spec) {
-      case 'disallowed':
-      case 'disallowed_STD3_mapped':
-      case 'disallowed_STD3_valid': {
+      case 'disallowed': {
         let [ start, end = start ] = codePoint.split('..');
         parsed.disallowed.push([ start, end ]);
         break;
@@ -86,6 +84,7 @@ let parsed = {
         break;
       }
 
+      case 'disallowed_STD3_mapped':
       case 'mapped': {
         let { length: valueSize } = value.split(/\s+/g);
         let table = parsed.mapped;
@@ -106,6 +105,7 @@ let parsed = {
         break;
       }
 
+      case 'disallowed_STD3_valid':
       case 'valid':
       case 'deviation':
         break;

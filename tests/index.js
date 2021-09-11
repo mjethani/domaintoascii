@@ -175,6 +175,17 @@ let rfc3490Separators = [
   'www\u{FF61}i\u{2764}.ws',
 ];
 
+let std3ASCII = [
+  // disallowed_STD3_valid
+  '≠',
+
+  // disallowed_STD3_mapped
+  '①',
+  '⑴',
+
+  '⁉',
+];
+
 describe('domainToASCII()', () => {
   let domainToASCII = null;
 
@@ -259,6 +270,14 @@ describe('domainToASCII()', () => {
     for (let domain of rfc3490Separators) {
       it(`should handle ${domain} like Node.js`, () => {
         assert.equal(domainToASCII(domain), url.domainToASCII(domain));
+      });
+    }
+  });
+
+  context('STD3 ASCII', () => {
+    for (let label of std3ASCII) {
+      it(`should handle ${label} like Node.js`, () => {
+        assert.equal(domainToASCII(label), url.domainToASCII(label));
       });
     }
   });
