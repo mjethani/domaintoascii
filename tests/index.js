@@ -163,6 +163,10 @@ let ip6Addresses = [
   '[0:0:0:0:0:0:0:0:0]',
 ];
 
+let percentEndoding = [
+  'i%E2%9D%A4.ws'
+];
+
 let combiningMarks = [
   '\u{0300}a',
   'a\u{0300}',
@@ -254,6 +258,14 @@ describe('domainToASCII()', () => {
     for (let address of ip6Addresses) {
       it(`should handle ${address} like Node.js`, () => {
         assert.equal(domainToASCII(address), url.domainToASCII(address));
+      });
+    }
+  });
+
+  context('Percent-encoding', () => {
+    for (let domain of percentEndoding) {
+      it(`should handle ${domain} like Node.js`, () => {
+        assert.equal(domainToASCII(domain), url.domainToASCII(domain));
       });
     }
   });

@@ -163,6 +163,14 @@ export function domainToASCII(domain, { skipIDNA = false } = {}) {
   if (domain[0] === '[' && domain[domain.length - 1] === ']')
     return urlEncode(domain);
 
+  // Percent-encoding.
+  if (domain.includes('%')) {
+    try {
+      domain = decodeURIComponent(domain);
+    } catch (error) {
+    }
+  }
+
   // Disallowed ASCII characters regardless of underlying implementation.
   if (/[\x00\t\n\r #%\/:\?@[\\\]]/.test(domain))
     return '';
